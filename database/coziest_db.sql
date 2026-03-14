@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 14, 2026 at 08:50 AM
+-- Generation Time: Mar 14, 2026 at 05:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,8 +71,8 @@ CREATE TABLE `inventory` (
 --
 
 INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `created_at`) VALUES
-(1, 1, 1, '2026-03-14 07:39:29'),
-(2, 2, 94, '2026-03-12 14:04:59'),
+(1, 1, 0, '2026-03-14 07:39:29'),
+(2, 2, 93, '2026-03-12 14:04:59'),
 (3, 3, 110, '2026-03-12 14:04:59'),
 (4, 4, 80, '2026-03-12 14:04:59'),
 (5, 5, 60, '2026-03-12 14:04:59'),
@@ -153,17 +153,6 @@ CREATE TABLE `orders` (
   `proof_of_payment` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`id`, `customer_id`, `order_number`, `status`, `order_details_id`, `total_amount`, `payment_method`, `delivery_address`, `created_at`, `updated_at`, `proof_of_payment`) VALUES
-(1, 1, 'ORD-1773462837', 'APPROVED', 0, 800.00, 'ONLINE', '134 J. Test Streeet', '2026-03-14 12:33:57', '2026-03-14 12:35:25', 'uploads/proof_of_payment/1773462837_Screenshot 2025-07-06 193317.png'),
-(2, 1, 'ORD-1773464003', 'APPROVED', 0, 200.00, 'ONLINE', 'N/A', '2026-03-14 12:53:23', '2026-03-14 12:53:34', 'uploads/proof_of_payment/1773464003_Screenshot 2025-07-06 193327.png'),
-(3, 1, 'ORD-1773464034', 'DECLINED', 0, 100.00, 'ONLINE', 'N/A', '2026-03-14 12:53:54', '2026-03-14 12:54:01', 'uploads/proof_of_payment/1773464034_Screenshot 2025-07-13 224150.png'),
-(4, 1, 'ORD-1773464054', 'APPROVED', 0, 100.00, 'ONLINE', 'N/A', '2026-03-14 12:54:14', '2026-03-14 15:28:34', 'uploads/proof_of_payment/1773464054_Screenshot 2025-07-18 181007.png'),
-(5, 1, 'ORD-1773467578', 'APPROVED', 0, 200.00, 'ONLINE', '123 Test Street Caloocan City', '2026-03-14 13:52:58', '2026-03-14 15:28:33', 'uploads/proof_of_payment/1773467578_Screenshot 2025-07-18 181821.png');
-
 -- --------------------------------------------------------
 
 --
@@ -178,18 +167,6 @@ CREATE TABLE `order_items` (
   `price` int(11) NOT NULL,
   `created_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `order_items`
---
-
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, `created_at`) VALUES
-(1, 1, 1, 8, 100, 2147483647),
-(2, 2, 2, 1, 100, 2147483647),
-(3, 2, 1, 1, 100, 2147483647),
-(4, 3, 1, 1, 100, 2147483647),
-(5, 4, 1, 1, 100, 2147483647),
-(6, 5, 1, 2, 100, 2147483647);
 
 -- --------------------------------------------------------
 
@@ -280,7 +257,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `email`, `delivery_address`, `password`, `is_verified`, `created_at`, `role`) VALUES
 (1, 'Jasper', 'David', 'Macaraeg', 'jasper@gmail.com', '123 Test Street Caloocan City', 'test1234', 0, '2026-03-08 22:16:51', 'Admin'),
 (2, 'Ethan', 'Test', 'Cunanan', 'ethan@gmail.com', '1504 Test Street Caloocan City', 'test1234', 0, '2026-03-08 22:36:46', 'User'),
-(3, 'Raine', 'White', 'Green', 'sdada@gmail.com', '1234 Goku Test Street Caloocan City', 'test1234', 0, '2026-03-13 19:52:50', 'Admin'),
+(3, 'Raine', 'White', 'Green', 'sdada@gmail.com', '1234 Goku Test Street Caloocan City', 'test1234', 0, '2026-03-13 19:52:50', 'User'),
 (4, 'Gerry', 'Darwin', 'Green', 'gerry@gmail.com', '130 K Street Caloocan City', 'test1234', 0, '2026-03-14 07:49:46', 'User'),
 (5, 'Cherry', 'Grey', 'Cong', 'cherry@gmail.com', '1234 White Lady Street', 'test1234', 0, '2026-03-14 07:51:19', 'User');
 
@@ -356,13 +333,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`

@@ -63,7 +63,7 @@ $conn->close();
     display: flex;
     flex-direction: column;
     gap: 32px;
-    max-width: 1100px;
+    max-width: 100%;
   }
 
   /* ── Page Header ── */

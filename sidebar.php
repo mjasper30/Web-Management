@@ -70,13 +70,6 @@ $role = $_SESSION['role'] ?? '';
         <?php if($role === 'Admin'): ?>
             <!-- Admin-only links -->
             <nav>
-                <a href="accounts.php" class="<?php echo $current_page === 'accounts.php' ? 'active' : ''; ?>">
-                    <span>👤</span>
-                    <span>Accounts</span>
-                </a>
-            </nav>
-
-            <nav>
                 <a href="orders.php" class="<?php echo $current_page === 'orders.php' ? 'active' : ''; ?>">
                     <span>📦</span>
                     <span>Orders</span>
@@ -84,9 +77,23 @@ $role = $_SESSION['role'] ?? '';
             </nav>
 
             <nav>
+                <a href="all_messages.php" class="<?php echo $current_page === 'all_messages.php' ? 'active' : ''; ?>">
+                    <span>💬</span>
+                    <span>Messages</span>
+                </a>
+            </nav>
+
+            <nav>
                 <a href="inventory.php" class="<?php echo $current_page === 'inventory.php' ? 'active' : ''; ?>">
                     <span>📦</span>
                     <span>Inventory</span>
+                </a>
+            </nav>
+
+            <nav>
+                <a href="accounts.php" class="<?php echo $current_page === 'accounts.php' ? 'active' : ''; ?>">
+                    <span>👤</span>
+                    <span>Accounts</span>
                 </a>
             </nav>
 

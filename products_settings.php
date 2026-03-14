@@ -55,7 +55,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
 // ── Handle Delete Product ───────────────────────────────────────
 if (isset($_POST['action']) && $_POST['action'] === 'delete') {
     $pid = intval($_POST['product_id']);
-    // Optionally delete the image file
     $res = $conn->query("SELECT picture FROM products WHERE product_id = $pid");
     if ($row = $res->fetch_assoc()) {
         if ($row['picture'] && file_exists($row['picture'])) unlink($row['picture']);
@@ -536,6 +535,69 @@ tbody td {
 .empty-state svg { width: 44px; height: 44px; opacity: 0.2; margin-bottom: 12px; }
 .empty-state p { font-size: 14px; }
 
+/* ── Pagination ──────────────────────────────────────────── */
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-top: 1px solid #f0ece6;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.page-info {
+  font-size: 13px;
+  color: #888;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1.5px solid #e0dbd3;
+  background: #faf9f7;
+  color: #555;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background: #ede9e4;
+  border-color: #ccc6be;
+}
+
+.page-btn.active {
+  background: #d11d1d;
+  border-color: #d11d1d;
+  color: #fff;
+  cursor: default;
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-ellipsis {
+  font-size: 13px;
+  color: #aaa;
+  padding: 0 4px;
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .layout-cols { grid-template-columns: 320px 1fr; }
@@ -727,6 +789,13 @@ tbody td {
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Footer -->
+        <div class="table-footer" id="tableFooter" style="display:none;">
+          <span class="page-info" id="pageInfo"></span>
+          <div class="pagination" id="pagination"></div>
+        </div>
+
       </div>
       <!-- /table-card -->
 
@@ -736,18 +805,107 @@ tbody td {
 </div><!-- /dashboard -->
 
 <script>
-// Live search + category filter
-function filterTable() {
+var ROWS_PER_PAGE = 6;
+var currentPage  = 1;
+
+function getAllRows() {
+  return Array.from(document.querySelectorAll('#productsTable tbody tr'));
+}
+
+function getFilteredRows() {
   var query = document.getElementById('searchInput').value.toLowerCase().trim();
   var cat   = document.getElementById('catFilter').value.toLowerCase().trim();
-  var rows  = document.querySelectorAll('#productsTable tbody tr');
-  rows.forEach(function(row) {
-    var text    = row.textContent.toLowerCase();
-    var rowCat  = (row.dataset.category || '').toLowerCase();
-    var matchQ  = !query || text.includes(query);
-    var matchC  = !cat   || rowCat === cat;
-    row.style.display = (matchQ && matchC) ? '' : 'none';
+  return getAllRows().filter(function(row) {
+    var text   = row.textContent.toLowerCase();
+    var rowCat = (row.dataset.category || '').toLowerCase();
+    var matchQ = !query || text.includes(query);
+    var matchC = !cat   || rowCat === cat;
+    return matchQ && matchC;
   });
+}
+
+// Live search + category filter — resets to page 1 on change
+function filterTable() {
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
+  var allRows     = getAllRows();
+  var filtered    = getFilteredRows();
+  var total       = filtered.length;
+  var pages       = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+  if (currentPage > pages) currentPage = pages;
+
+  var start = (currentPage - 1) * ROWS_PER_PAGE;
+  var end   = start + ROWS_PER_PAGE;
+
+  // Hide all rows first
+  allRows.forEach(function(row) { row.style.display = 'none'; });
+
+  // Show only the current page slice of filtered rows
+  filtered.forEach(function(row, i) {
+    row.style.display = (i >= start && i < end) ? '' : 'none';
+  });
+
+  // Page info text
+  var infoEl = document.getElementById('pageInfo');
+  if (total === 0) {
+    infoEl.textContent = 'No products found';
+  } else {
+    infoEl.textContent =
+      'Showing ' + (start + 1) + '–' + Math.min(end, total) + ' of ' + total;
+  }
+
+  // Show/hide footer
+  var footer = document.getElementById('tableFooter');
+  footer.style.display = (pages > 1 || total > 0) ? 'flex' : 'none';
+
+  // Build pagination buttons
+  var pg = document.getElementById('pagination');
+  pg.innerHTML = '';
+
+  function makeBtn(label, page, extraClass, disabled) {
+    var b = document.createElement('button');
+    b.className = 'page-btn' + (extraClass ? ' ' + extraClass : '');
+    b.innerHTML = label;
+    b.disabled  = !!disabled;
+    if (!disabled && page !== null) {
+      b.onclick = function() { currentPage = page; renderPage(); };
+    }
+    return b;
+  }
+
+  // Prev button
+  pg.appendChild(makeBtn('&#8592;', currentPage - 1, '', currentPage === 1));
+
+  // Page number range with ellipsis
+  var range = [];
+  if (pages <= 7) {
+    for (var i = 1; i <= pages; i++) range.push(i);
+  } else {
+    range.push(1);
+    if (currentPage > 3) range.push('…');
+    var lo = Math.max(2, currentPage - 1);
+    var hi = Math.min(pages - 1, currentPage + 1);
+    for (var i = lo; i <= hi; i++) range.push(i);
+    if (currentPage < pages - 2) range.push('…');
+    range.push(pages);
+  }
+
+  range.forEach(function(item) {
+    if (item === '…') {
+      var el = document.createElement('span');
+      el.className = 'page-ellipsis';
+      el.textContent = '…';
+      pg.appendChild(el);
+    } else {
+      pg.appendChild(makeBtn(item, item, item === currentPage ? 'active' : '', item === currentPage));
+    }
+  });
+
+  // Next button
+  pg.appendChild(makeBtn('&#8594;', currentPage + 1, '', currentPage === pages));
 }
 
 // Image preview
@@ -776,6 +934,9 @@ if (zone) {
   zone.addEventListener('dragleave', function()  { zone.classList.remove('dragover'); });
   zone.addEventListener('drop',      function(e){ e.preventDefault(); zone.classList.remove('dragover'); });
 }
+
+// Initialise pagination on load
+renderPage();
 </script>
 
 </body>
